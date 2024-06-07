@@ -156,10 +156,8 @@ public class Servicios {
 		}
 		Tarea tarea = null;
 		ArrayList<Tarea> tareasRestantes = null;
-		if(!tareasPendientes.isEmpty()){
-			tarea = tareasPendientes.get(0);
-			tareasRestantes = new ArrayList<>(tareasPendientes.subList(1, tareasPendientes.size())); //Reestructuracion del arraylist para que quede el siguiente elemento en la posicion 0
-		}
+		tarea = tareasPendientes.get(0);
+		tareasRestantes = new ArrayList<>(tareasPendientes.subList(1, tareasPendientes.size())); //Reestructuracion del arraylist para que quede el siguiente elemento en la posicion 0
 
 		procPendientes.sort(comparadorProcesadores);
 
@@ -170,12 +168,11 @@ public class Servicios {
 			if (puedeAsignarTarea(procesador, tarea, tiempoMax)) {
 				procesador.asignarTarea(tarea);
 				estadosGenerados++;
-					solucionBack = backtrack(tiempoMax, tareasRestantes, procPendientes);
-
-					if (solucionBack) {
-						seEncontroSolucion = true;
-					}
-					procesador.removerTarea(tarea);
+				solucionBack = backtrack(tiempoMax, tareasRestantes, procPendientes);
+				if (solucionBack) {
+					seEncontroSolucion = true;
+				}
+				procesador.removerTarea(tarea);
 
 			}
 		}
@@ -186,14 +183,7 @@ public class Servicios {
 	private boolean esMejorSolucion(Solucion actual){
 		return actual.getTiempoMaximo()>mejorSolucion.getTiempoMaximo();
 	}
-	private boolean todasLasTareasAsignadas(ArrayList<Tarea> tareasTotales){ //Complejidad O(n)
-		for(Tarea tarea : tareasTotales){
-			if(!tarea.estaAsignada()){
-				return false;
-			}
-		}
-		return true;
-	}
+
 
 	private boolean puedeAsignarTarea(Procesador procesador, Tarea tarea, int tiempoMax){ //Complejidad O(1) solo hay que hacer una cuenta
 		int tiempoTotal = procesador.tiempoTotal() + tarea.getTiempo();
@@ -275,11 +265,7 @@ public class Servicios {
 		mostrarResultadoGreedy();
 	}
 
-	private Tarea obtenerMejorTarea(ArrayList<Tarea> tareasPendientes){
-		tareasPendientes.sort(comparador);
-		Tarea tarea = tareasPendientes.get(0);
-		return tarea;
-	}
+
 
 	private Procesador obtenerMejorProcesador(int tiempoMax, Tarea tarea){
 		Procesador mejorProc = null;
