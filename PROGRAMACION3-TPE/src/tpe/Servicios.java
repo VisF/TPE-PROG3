@@ -43,10 +43,10 @@ public class Servicios {
 		this.sonCritica = new ArrayList<>();
 		this.comparador = new ComparadorTiempoEjecucion();
 		this.comparadorProcesadores = new ComparadorTiempoTotal();
-		this.tareasPendientes = new ArrayList<>(tareas.values());
-		tareasPendientes.sort(comparador);
 		tareas = reader.readTasks(pathTareas);
 		procesadores = reader.readProcessors(pathProcesadores);
+		this.tareasPendientes = new ArrayList<>(tareas.values());
+		tareasPendientes.sort(comparador);
 		if (this.tareas == null || this.tareas.isEmpty()) {
 			throw new IllegalArgumentException("No se pudieron cargar las tareas desde el archivo.");
 		}
@@ -133,7 +133,7 @@ public class Servicios {
 
 		 //Genero listas para verificar que no queden
 		ArrayList<Procesador> procesadoresPendientes = new ArrayList<>(procesadores.values());
-		boolean solucionEncontrada = backtrack(tiempoMax, tareasPendientes, procesadoresPendientes, null);
+		boolean solucionEncontrada = backtrack(tiempoMax, tareasPendientes, procesadoresPendientes);
 		if(solucionEncontrada) {
 			System.out.println("Proceso terminado");
 			mostrarResultadoBacktracking();
@@ -145,16 +145,15 @@ public class Servicios {
 
 	}
 
-	private boolean backtrack(int tiempoMax, ArrayList<Tarea> tareasPendientes, ArrayList<Procesador> procPendientes, Solucion mejorSolucion) {
+	private boolean backtrack(int tiempoMax, ArrayList<Tarea> tareasPendientes, ArrayList<Procesador> procPendientes) {
 		if (tareasPendientes.isEmpty()) {
 			Solucion solucionActual = actualizarMejorSolucion();
-			if (mejorSolucion == null || esMejorSolucion(solucionActual, mejorSolucion)) {
+			if (mejorSolucion == null || esMejorSolucion(solucionActual)) {
 				mejorSolucion = solucionActual;
 			}
 			return true;
 
 		}
-		System.out.println("Estado: " + estadosGenerados);
 		Tarea tarea = null;
 		ArrayList<Tarea> tareasRestantes = null;
 		if(!tareasPendientes.isEmpty()){
@@ -171,7 +170,7 @@ public class Servicios {
 			if (puedeAsignarTarea(procesador, tarea, tiempoMax)) {
 				procesador.asignarTarea(tarea);
 				estadosGenerados++;
-					solucionBack = backtrack(tiempoMax, tareasRestantes, procPendientes, mejorSolucion);
+					solucionBack = backtrack(tiempoMax, tareasRestantes, procPendientes);
 
 					if (solucionBack) {
 						seEncontroSolucion = true;
@@ -184,8 +183,8 @@ public class Servicios {
 		return seEncontroSolucion;
 	}
 
-	private boolean esMejorSolucion(Solucion actual, Solucion mejor){
-		return actual.getTiempoMaximo()>mejor.getTiempoMaximo();
+	private boolean esMejorSolucion(Solucion actual){
+		return actual.getTiempoMaximo()>mejorSolucion.getTiempoMaximo();
 	}
 	private boolean todasLasTareasAsignadas(ArrayList<Tarea> tareasTotales){ //Complejidad O(n)
 		for(Tarea tarea : tareasTotales){
@@ -214,7 +213,7 @@ public class Servicios {
 			asignaciones.add(new ArrayList<>(procesador.getTareas()));
 		}
 		Solucion  sol = new Solucion(asignaciones, tiempoMaximo);
-		if(mejorSolucion== null ||sol.esMejorQue(mejorSolucion)){
+		if(mejorSolucion== null ||esMejorSolucion(sol)){
 			mejorSolucion = sol;
 		}
 		return sol;

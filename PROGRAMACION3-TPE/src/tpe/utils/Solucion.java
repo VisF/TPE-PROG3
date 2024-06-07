@@ -8,9 +8,7 @@ public class Solucion {
         this.asignaciones = asignaciones;
         this.tiempoMaximo = tiempoMaximo;
     }
-    public boolean esMejorQue(Solucion otra) {
-        return this.tiempoMaximo < otra.tiempoMaximo;
-    }
+
     public List<List<Tarea>> getAsignaciones() {
         return asignaciones;
     }
