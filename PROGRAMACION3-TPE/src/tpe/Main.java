@@ -16,7 +16,7 @@ public class Main {
 
 
 		int tiempoMaximo = 110;
-		//servicio.backtracking(tiempoMaximo);
+		servicio.backtracking(tiempoMaximo);
 		//servicio.mostrarResultadoBacktracking();
 
 		servicio.greedy(tiempoMaximo);
