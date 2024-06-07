@@ -133,7 +133,7 @@ public class Servicios {
 
 		 //Genero listas para verificar que no queden
 		ArrayList<Procesador> procesadoresPendientes = new ArrayList<>(procesadores.values());
-		boolean solucionEncontrada = backtrack(tiempoMax, tareasPendientes, procesadoresPendientes);
+		boolean solucionEncontrada = backtrack(tiempoMax, tareasPendientes, procesadoresPendientes, mejorSolucion);
 		if(solucionEncontrada) {
 			System.out.println("Proceso terminado");
 			mostrarResultadoBacktracking();
@@ -145,19 +145,21 @@ public class Servicios {
 
 	}
 
-	private boolean backtrack(int tiempoMax, ArrayList<Tarea> tareasPendientes, ArrayList<Procesador> procPendientes) {
-		if (tareasPendientes.isEmpty()) {
-			Solucion solucionActual = actualizarMejorSolucion();
+	private boolean backtrack(int tiempoMax, ArrayList<Tarea> tareasExtra, ArrayList<Procesador> procPendientes, Solucion solucionActual) {
+
+		if (tareasExtra.isEmpty()) {
+			solucionActual = actualizarMejorSolucion();
 			if (mejorSolucion == null || esMejorSolucion(solucionActual)) {
 				mejorSolucion = solucionActual;
+
 			}
 			return true;
 
 		}
 		Tarea tarea = null;
 		ArrayList<Tarea> tareasRestantes = null;
-		tarea = tareasPendientes.get(0);
-		tareasRestantes = new ArrayList<>(tareasPendientes.subList(1, tareasPendientes.size())); //Reestructuracion del arraylist para que quede el siguiente elemento en la posicion 0
+		tarea = tareasExtra.get(0);
+		tareasRestantes = new ArrayList<>(tareasExtra.subList(1, tareasExtra.size())); //Reestructuracion del arraylist para que quede el siguiente elemento en la posicion 0
 
 		procPendientes.sort(comparadorProcesadores);
 
@@ -168,7 +170,7 @@ public class Servicios {
 			if (puedeAsignarTarea(procesador, tarea, tiempoMax)) {
 				procesador.asignarTarea(tarea);
 				estadosGenerados++;
-				solucionBack = backtrack(tiempoMax, tareasRestantes, procPendientes);
+				solucionBack = backtrack(tiempoMax, tareasRestantes, procPendientes, solucionActual);
 				if (solucionBack) {
 					seEncontroSolucion = true;
 				}
@@ -181,11 +183,14 @@ public class Servicios {
 	}
 
 	private boolean esMejorSolucion(Solucion actual){
-		return actual.getTiempoMaximo()>mejorSolucion.getTiempoMaximo();
+		return actual.getTiempoMaximo()<mejorSolucion.getTiempoMaximo();
 	}
 
 
 	private boolean puedeAsignarTarea(Procesador procesador, Tarea tarea, int tiempoMax){ //Complejidad O(1) solo hay que hacer una cuenta
+		if(tarea == null){
+			return false;
+		}
 		int tiempoTotal = procesador.tiempoTotal() + tarea.getTiempo();
 		if(tiempoTotal> tiempoMax && !procesador.isRefrigerado()){
 			return false;
